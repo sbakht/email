@@ -1,0 +1,16 @@
+body {
+    background:#ececec;
+    font:13px/1.5 helvetica, arial, san-serif;
+}
+
+.email {
+
+}
+
+.email-container_body {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
