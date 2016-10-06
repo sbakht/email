@@ -3,14 +3,62 @@ body {
     font:13px/1.5 helvetica, arial, san-serif;
 }
 
-.email {
-
+#container {
+    margin: 0 12px;
+    display: flex;
 }
 
-.email-container_body {
+#email-nav {
+    background: gray;
+    display: flex;
+    width: 10%;
+    flex-direction: column;
+    align-items: center;
+}
+
+#email-nav span {
+    cursor:pointer;
+}
+
+#email-catalog {
+    width: 90%;
+}
+
+#email-container {
+    width: 90%;
+}
+
+.email-catalog_email {
+    border: 1px solid black;
+    background: red;
+}
+
+.email-catalog_email--unread {
+    background: yellow;
+}
+
+.email-catalog_email:hover {
+    background: green;
+}
+
+
+.email-catalog_email_name {
     display: inline-block;
-    max-width: 100%;
+    width: 10%;
+}
+.email-catalog_email_subject {
+    display: inline-block;
+    width: 10%;
+}
+
+.email-catalog_email_body {
+    display: inline-block;
+    width: 80%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.hide {
+    display:none;
 }

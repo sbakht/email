@@ -141,6 +141,12 @@ var CORE = (function () {
             },
             apply_attrs: function (el, attrs) {
                 jQuery(el).attr(attrs);             
+            },
+            show : function(CONTAINER) {
+                jQuery(CONTAINER).removeClass("hide");
+            },
+            hide : function(CONTAINER) {
+                jQuery(CONTAINER).addClass("hide");
             }
         },
         ajax : {

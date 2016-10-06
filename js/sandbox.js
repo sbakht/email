@@ -5,6 +5,16 @@ var Sandbox =  {
             find : function (selector) {
                 return CONTAINER.query(selector);
             },
+            hide : function() {
+                core.dom.hide(CONTAINER);
+            },
+            show : function() {
+                core.dom.show(CONTAINER);
+            },
+            render : function(data) {
+                core.createTemplate(module_selector, data);
+                core.dom.show(CONTAINER);
+            },
             addEvent : function (element, type, fn) {
                 core.dom.bind(element, type, fn);           
             },

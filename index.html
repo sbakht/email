@@ -8,27 +8,42 @@
 <body>
     <div id="main">
 
-        <!-- <div id="container"> -->
-            <div id="emails-catalog">
+        <div id="container">
+            <div id="email-nav">
+                <span class="email-nav_inbox">Inbox</span>
+                <span class="email-nav_trash">Trash</span>
             </div>
-        <!-- </div> -->
+            <div id="email-catalog"></div>
+            <div id="email-container" class="hide"></div>
+        </div>
 
 
 
-        <script id="emails-catalog-template" type="text/x-handlebars-template">
+        <script id="email-catalog-template" type="text/x-handlebars-template">
             {{#each this}}
-                <div class="email">   
-                    <span>{{name}}</span>
+                <div class="email-catalog_email {{#if unread}}email-catalog_email--unread{{/if}}" data-email-id="{{id}}">   
+                    <span class="email-catalog_email_name">{{name}}</span>
                         {{#if subject}}
-                            <span>{{subject}}</span>
+                            <span class="email-catalog_email_subject">{{subject}}</span>
                         {{else}}
-                            <span>(No Subject)</span>
+                            <span class="email-catalog_email_subject">(No Subject)</span>
                         {{/if}}
-                    <span class="email-container_body">{{body}}</span>
+                    <span class="email-catalog_email_body">{{body}}</span>
                 </div>
             {{/each}}
         </script>
         
+        <script id="email-container-template" type="text/x-handlebars-template">
+                <div class="email-catalog_email">   
+                    <span class="email-catalog_email_name">{{name}}</span>
+                        {{#if subject}}
+                            <span class="email-catalog_email_subject">{{subject}}</span>
+                        {{else}}
+                            <span class="email-catalog_email_subject">(No Subject)</span>
+                        {{/if}}
+                    <span class="email-catalog_email_body">{{body}}</span>
+                </div>
+        </script>
 
 
         <script src="js/handlebars.js"></script>
