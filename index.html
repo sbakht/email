@@ -22,6 +22,7 @@
         <script id="email-catalog-template" type="text/x-handlebars-template">
             {{#each this}}
                 <div class="email-catalog_email {{#if unread}}email-catalog_email--unread{{/if}}" data-email-id="{{id}}">   
+                    <input type="checkbox" class="email-catalog_email_checkbox" />
                     <span class="email-catalog_email_name">{{name}}</span>
                         {{#if subject}}
                             <span class="email-catalog_email_subject">{{subject}}</span>
