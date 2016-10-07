@@ -2,8 +2,8 @@ CORE.create_module("random-email", function(sb) {
 
     return {
         init : function () {
-            // setInterval(this.createEmail.bind(this), 5000);
-            this.createEmail();
+            setInterval(this.createEmail.bind(this), 2000);
+            // this.createEmail();
         },
         destroy : function () {
         },
