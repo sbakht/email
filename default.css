@@ -53,7 +53,7 @@ body {
 
 .email-catalog_email_body {
     display: inline-block;
-    width: 80%;
+    width: 70%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
