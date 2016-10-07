@@ -33,7 +33,7 @@ var Sandbox =  {
                 }         
             },
             listen : function (evts) {
-                if (core.is_obj(evts)) {
+                if (core.is_obj(evts) || core.is_arr(evts)) {
                     core.registerEvents(evts, module_selector);
                 }
             },
