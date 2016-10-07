@@ -113,7 +113,7 @@ CORE.create_module("db-emails", function(sb) {
         selected.push(id);
         emails[id].checked = true;
     }
-    var markSelectedEmailsAsRead = function() {
+    var setEmailsRead = function() {
         selected.forEach(function(id) {
             delete emails[id].unread;
         });

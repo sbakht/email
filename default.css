@@ -50,6 +50,7 @@ body {
 }
 .email-catalog_email_subject {
     display: inline-block;
+    font-weight: bold;
     width: 10%;
 }
 
