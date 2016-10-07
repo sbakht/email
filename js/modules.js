@@ -104,7 +104,6 @@ CORE.create_module("db-emails", function(sb) {
     }
 
     var addNewEmail = function(email) {
-        debugger;
         email.unread = true;
         email.date = Date.now();
         emails[guidGenerator()] = email;
@@ -116,12 +115,12 @@ CORE.create_module("db-emails", function(sb) {
     }
     var setEmailsRead = function() {
         selected.forEach(function(id) {
-            delete emails[id].unread;
+            emails[id].unread = false;
         });
         notifyData();
     }
     var setEmailRead = function(id) {
-        delete emails[id].unread;
+        emails[id].unread = false;
     }
 
     return {
