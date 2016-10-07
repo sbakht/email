@@ -44,7 +44,7 @@ CORE.create_module("email-catalog", function (sb) {
         init : function() {
             sb.onEvent(".email-catalog_email", "click", openEmail);
             sb.onEvent(".email-catalog_email_checkbox", "click", selectEmailCheckbox);
-            sb.onEvent("button", "click", markSelectedEmailsAsRead);
+            sb.onEvent("#email-mark-as-read", "click", markSelectedEmailsAsRead);
 
             sb.listen([
                 "db-emails",
