@@ -2,12 +2,16 @@ CORE.create_module("email-nav", function (sb) {
     return {
         init : function() {
             sb.onEvent(".email-nav_inbox", "click", function() {
+                $("#email-nav").find(".nav--selected").removeClass("nav--selected");
+                $(this).addClass("nav--selected");
                 sb.notify({
                     type : "open-category",
                     data : "inbox"
                 });
             });
             sb.onEvent(".email-nav_trash", "click", function() {
+                $("#email-nav").find(".nav--selected").removeClass("nav--selected");
+                $(this).addClass("nav--selected");
                 sb.notify({
                     type : "open-category",
                     data : "trash"
@@ -135,22 +139,27 @@ CORE.create_module("email-catalog", function (sb) {
 });
 
 CORE.create_module("email-container", function(sb) {
+    var emails;
     return {
         init : function() {
+            emails = [];
             sb.listen([
+                "db-emails",
                 "open-category",
                 "open-email",
-                "open-trash"
             ]);
         },
         destroy : function() {
             sb.ignore(["open-email","open-category"]);
         },
+        dbEmails : function(data) {
+            emails = data;
+        },
         openCategory : function() {
             sb.hide();
         },
-        openEmail : function(data) {
-            sb.render(data);
+        openEmail : function(id) {
+            sb.render(emails[id]);
         }
     }
 });

@@ -10,7 +10,7 @@
 
         <div id="container">
             <div id="email-nav">
-                <span class="email-nav_inbox">Inbox</span>
+                <span class="email-nav_inbox nav--selected">Inbox</span>
                 <span class="email-nav_trash">Trash</span>
             </div>
             <div id="main-area">
@@ -39,19 +39,14 @@
                         {{/if}}
                     <span class="email-catalog_email_body">{{body}}</span>
                 </div>
+            {{else}}
+                <i>No emails here!</i>
             {{/each}}
         </script>
         
         <script id="email-container-template" type="text/x-handlebars-template">
-                <div class="email-catalog_email">   
-                    <span class="email-catalog_email_name">{{name}}</span>
-                        {{#if subject}}
-                            <span class="email-catalog_email_subject">{{subject}}</span>
-                        {{else}}
-                            <span class="email-catalog_email_subject">(No Subject)</span>
-                        {{/if}}
-                    <span class="email-catalog_email_body">{{body}}</span>
-                </div>
+            <p class="email-container_from">{{name}} ({{email}})</p>
+            <p class="email-container_body">{{body}}</p>
         </script>
 
 
