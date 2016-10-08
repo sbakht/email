@@ -15,13 +15,27 @@ CORE.create_module("email-nav", function (sb) {
 CORE.create_module("catalog-control", function (sb) {
     var markSelectedEmailsAsRead = function() {
         sb.notify({ 
-            type : "mark-selected-emails-as-read"
+            type : "selected-emails-unread-state",
+            data : false
         });
     };
-    
+    var markSelectedEmailsAsUnRead = function() {
+        sb.notify({ 
+            type : "selected-emails-unread-state",
+            data : true
+        });
+    };
+    var deleteSelectedEmails = function() {
+        sb.notify({ 
+            type : "delete-selected-emails"
+        });
+    };
+
     return {
         init : function() {
             sb.onEvent("#email-mark-as-read", "click", markSelectedEmailsAsRead);
+            sb.onEvent("#email-mark-as-unread", "click", markSelectedEmailsAsUnRead);
+            sb.onEvent("#email-delete", "click", deleteSelectedEmails);
         },
         destroy : function () {
         }
@@ -124,14 +138,14 @@ CORE.create_module("db-emails", function(sb) {
         selected.push(id);
         emails[id].checked = true;
     }
-    var setEmailsRead = function() {
-        selected.forEach(function(id) {
-            emails[id].unread = false;
-        });
-        notifyData();
-    }
     var setEmailRead = function(id) {
         emails[id].unread = false;
+    }
+    var setEmailsUnreadState = function(unread) {
+        selected.forEach(function(id) {
+            emails[id].unread = unread;
+        });
+        notifyData();
     }
 
     return {
@@ -147,7 +161,7 @@ CORE.create_module("db-emails", function(sb) {
             sb.listen([
                 "generate-email",
                 "select-email-checkbox",
-                "mark-selected-emails-as-read",
+                "selected-emails-unread-state",
                 "open-email"
             ]);
         },
@@ -159,8 +173,8 @@ CORE.create_module("db-emails", function(sb) {
         selectEmailCheckbox : function(id) {
            setEmailChecked(id);
         },
-        markSelectedEmailsAsRead : function() {
-           setEmailsRead(); 
+        selectedEmailsUnreadState : function(unread) {
+            setEmailsUnreadState(unread);
         },
         openEmail : function(id) {
            setEmailRead(id); 
