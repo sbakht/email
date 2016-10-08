@@ -37,12 +37,18 @@ CORE.create_module("catalog-control", function (sb) {
             type : "delete-selected-emails"
         });
     };
+    var deleteSelectedEmailsForever = function() {
+        sb.notify({ 
+            type : "delete-selected-emails-forever"
+        });        
+    };
 
     return {
         init : function() {
             sb.onEvent("#email-mark-as-read", "click", markSelectedEmailsAsRead);
             sb.onEvent("#email-mark-as-unread", "click", markSelectedEmailsAsUnRead);
             sb.onEvent("#email-delete", "click", deleteSelectedEmails);
+            sb.onEvent("#email-delete-forever", "click", deleteSelectedEmailsForever);
 
             sb.listen([
                 "open-category",
@@ -51,7 +57,14 @@ CORE.create_module("catalog-control", function (sb) {
         },
         destroy : function () {
         },
-        openCategory : function() {
+        openCategory : function(category) {
+            if(category === "inbox") {
+                sb.show("#email-delete");
+                sb.hide("#email-delete-forever");
+            }else if(category === "trash"){
+                sb.show("#email-delete-forever");
+                sb.hide("#email-delete");
+            }
             sb.show();
         },
         openEmail : function() {
@@ -166,6 +179,12 @@ CORE.create_module("db-emails", function(sb) {
         });
         notifyData();
     }
+    var deleteSelectedEmailsForever = function() {
+        selected.forEach(function(id) {
+            delete emails[id];
+        });
+        notifyData();
+    }
     var addNewEmail = function(email) {
         email.unread = true;
         email.date = Date.now();
@@ -198,6 +217,7 @@ CORE.create_module("db-emails", function(sb) {
             notifyData();
             sb.listen([
                 "delete-selected-emails",
+                "delete-selected-emails-forever",
                 "generate-email",
                 "select-email-checkbox",
                 "selected-emails-unread-state",
@@ -208,6 +228,9 @@ CORE.create_module("db-emails", function(sb) {
         },
         deleteSelectedEmails : function() {
             deleteSelectedEmails();
+        },
+        deleteSelectedEmailsForever : function() {
+            deleteSelectedEmailsForever();
         },
         generateEmail : function(email) {
             addNewEmail(email);
