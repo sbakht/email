@@ -3,7 +3,14 @@ CORE.create_module("email-nav", function (sb) {
         init : function() {
             sb.onEvent(".email-nav_inbox", "click", function() {
                 sb.notify({
-                    type : "open-catalog"
+                    type : "open-category",
+                    data : "inbox"
+                });
+            });
+            sb.onEvent(".email-nav_trash", "click", function() {
+                sb.notify({
+                    type : "open-category",
+                    data : "trash"
                 });
             });
         },
@@ -38,13 +45,13 @@ CORE.create_module("catalog-control", function (sb) {
             sb.onEvent("#email-delete", "click", deleteSelectedEmails);
 
             sb.listen([
-                "open-catalog",
+                "open-category",
                 "open-email"
             ]);
         },
         destroy : function () {
         },
-        openCatalog : function() {
+        openCategory : function() {
             sb.show();
         },
         openEmail : function() {
@@ -56,6 +63,12 @@ CORE.create_module("catalog-control", function (sb) {
 
 CORE.create_module("email-catalog", function (sb) {
     var emails;
+    var activeCategory;
+
+    Object.filter = (obj, predicate) => 
+    Object.keys(obj)
+          .filter( key => predicate(obj[key]) )
+          .reduce( (res, key) => (res[key] = obj[key], res), {} );
 
     var openEmail = function(e) {
         sb.hide();
@@ -71,31 +84,38 @@ CORE.create_module("email-catalog", function (sb) {
             data : e.currentTarget.getAttribute("data-email-id")
         });
     }
-
-    var fetchEmails = function(data) {
-        emails = data;
-        sb.template(emails);
+    var getCategoryData = function() {
+        if(activeCategory === "inbox") {
+            return Object.filter(emails, email => !email.trash);
+        }else if(activeCategory === "trash"){
+            return Object.filter(emails, email => email.trash);
+        }else{
+            throw new Error("No category given");
+        }
     }
 
     return {
         init : function() {
+            activeCategory = "inbox";   
             sb.onEvent(".email-catalog_email", "click", openEmail);
             sb.onEvent(".email-catalog_email_checkbox", "click", selectEmailCheckbox);
 
             sb.listen([
                 "db-emails",
-                "open-catalog"
+                "open-category"
             ]);
         },
         destroy : function () {
-            sb.ignore(["db-emails", "open-catalog"]);
+            sb.ignore(["db-emails", "open-category"]);
             emails = null;
         },
         dbEmails : function(data) {
-            fetchEmails(data);
+            emails = data;
+            sb.template(getCategoryData(activeCategory));
         },
-        openCatalog : function() {
-            sb.render(emails);
+        openCategory : function(category) {
+            activeCategory = category;
+            sb.render(getCategoryData(activeCategory));
         }
 
     }
@@ -105,14 +125,15 @@ CORE.create_module("email-container", function(sb) {
     return {
         init : function() {
             sb.listen([
-                "open-catalog",
-                "open-email"
+                "open-category",
+                "open-email",
+                "open-trash"
             ]);
         },
         destroy : function() {
-            sb.ignore(["open-email","open-catalog"]);
+            sb.ignore(["open-email","open-category"]);
         },
-        openCatalog : function() {
+        openCategory : function() {
             sb.hide();
         },
         openEmail : function(data) {
