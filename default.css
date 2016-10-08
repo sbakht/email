@@ -11,7 +11,7 @@ body {
 #email-nav {
     background: gray;
     display: flex;
-    width: 10%;
+    width: 6%;
     flex-direction: column;
     align-items: center;
 }
@@ -20,12 +20,12 @@ body {
     cursor:pointer;
 }
 
-#email-catalog {
-    width: 90%;
+#main-area {
+    width: 94%;
 }
 
 #email-container {
-    width: 90%;
+    width: 94%;
 }
 
 .email-catalog_email {

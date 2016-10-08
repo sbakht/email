@@ -12,6 +12,23 @@ CORE.create_module("email-nav", function (sb) {
     }
 });
 
+CORE.create_module("catalog-control", function (sb) {
+    var markSelectedEmailsAsRead = function() {
+        sb.notify({ 
+            type : "mark-selected-emails-as-read"
+        });
+    };
+    
+    return {
+        init : function() {
+            sb.onEvent("#email-mark-as-read", "click", markSelectedEmailsAsRead);
+        },
+        destroy : function () {
+        }
+    }
+});
+
+
 CORE.create_module("email-catalog", function (sb) {
     var emails;
 
@@ -29,11 +46,6 @@ CORE.create_module("email-catalog", function (sb) {
             data : e.currentTarget.getAttribute("data-email-id")
         });
     }
-    var markSelectedEmailsAsRead = function() {
-        sb.notify({ 
-            type : "mark-selected-emails-as-read"
-        });
-    }
 
     var fetchEmails = function(data) {
         emails = data;
@@ -44,7 +56,6 @@ CORE.create_module("email-catalog", function (sb) {
         init : function() {
             sb.onEvent(".email-catalog_email", "click", openEmail);
             sb.onEvent(".email-catalog_email_checkbox", "click", selectEmailCheckbox);
-            sb.onEvent("#email-mark-as-read", "click", markSelectedEmailsAsRead);
 
             sb.listen([
                 "db-emails",
