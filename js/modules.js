@@ -36,8 +36,19 @@ CORE.create_module("catalog-control", function (sb) {
             sb.onEvent("#email-mark-as-read", "click", markSelectedEmailsAsRead);
             sb.onEvent("#email-mark-as-unread", "click", markSelectedEmailsAsUnRead);
             sb.onEvent("#email-delete", "click", deleteSelectedEmails);
+
+            sb.listen([
+                "open-catalog",
+                "open-email"
+            ]);
         },
         destroy : function () {
+        },
+        openCatalog : function() {
+            sb.show();
+        },
+        openEmail : function() {
+            sb.hide();
         }
     }
 });
@@ -128,6 +139,12 @@ CORE.create_module("db-emails", function(sb) {
         });
     }
 
+    var deleteSelectedEmails = function() {
+        selected.forEach(function(id) {
+            emails[id].trash = true;
+        });
+        notifyData();
+    }
     var addNewEmail = function(email) {
         email.unread = true;
         email.date = Date.now();
@@ -159,6 +176,7 @@ CORE.create_module("db-emails", function(sb) {
 
             notifyData();
             sb.listen([
+                "delete-selected-emails",
                 "generate-email",
                 "select-email-checkbox",
                 "selected-emails-unread-state",
@@ -166,6 +184,9 @@ CORE.create_module("db-emails", function(sb) {
             ]);
         },
         destroy : function() {
+        },
+        deleteSelectedEmails : function() {
+            deleteSelectedEmails();
         },
         generateEmail : function(email) {
             addNewEmail(email);
