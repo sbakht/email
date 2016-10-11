@@ -58,6 +58,16 @@ var CORE = (function () {
             }
         },
         registerEvents : function (evts, mod) {
+            if(this.is_arr(evts) && mod) {
+                var temp = {};
+                evts.forEach(function(evtName) {
+                    temp[evtName] = moduleData[mod].instance[evtName.replace(/-\w/g, function(match) {
+                        return match[1].toUpperCase();
+                    })];
+                });
+                evts = temp;
+            }
+
             if (this.is_obj(evts) && mod) {
                 if (moduleData[mod]) {
                     moduleData[mod].events = evts;

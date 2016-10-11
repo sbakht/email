@@ -20,8 +20,10 @@
 
 
         <script id="email-catalog-template" type="text/x-handlebars-template">
+            <button id="email-mark-as-read">Mark As Read</button>
             {{#each this}}
-                <div class="email-catalog_email {{#if unread}}email-catalog_email--unread{{/if}}" data-email-id="{{id}}">   
+                <div class="email-catalog_email {{#if unread}}email-catalog_email--unread{{/if}}" data-email-id="{{@key}}">   
+                    <input type="checkbox" class="email-catalog_email_checkbox" {{#if checked}}checked{{/if}} data-email-id="{{@key}}" />
                     <span class="email-catalog_email_name">{{name}}</span>
                         {{#if subject}}
                             <span class="email-catalog_email_subject">{{subject}}</span>

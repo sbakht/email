@@ -31,6 +31,7 @@ body {
 .email-catalog_email {
     border: 1px solid black;
     background: red;
+    display: flex;
 }
 
 .email-catalog_email--unread {
@@ -45,9 +46,11 @@ body {
 .email-catalog_email_name {
     display: inline-block;
     width: 10%;
+    margin-left: 12px;
 }
 .email-catalog_email_subject {
     display: inline-block;
+    font-weight: bold;
     width: 10%;
 }
 
