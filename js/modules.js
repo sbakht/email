@@ -96,10 +96,17 @@ CORE.create_module("email-catalog", function (sb) {
     }
     var selectEmailCheckbox = function(e) {
         e.stopPropagation();
-        sb.notify({
-            type : "select-email-checkbox",
-            data : e.currentTarget.getAttribute("data-email-id")
-        });
+        if(e.currentTarget.checked) {
+            sb.notify({
+                type : "select-email-checkbox",
+                data : e.currentTarget.getAttribute("data-email-id")
+            });
+        }else{
+            sb.notify({
+                type : "deselect-email-checkbox",
+                data : e.currentTarget.getAttribute("data-email-id")
+            });
+        }
     }
     var getCategoryData = function() {
         if(activeCategory === "inbox") {
@@ -204,6 +211,15 @@ CORE.create_module("db-emails", function(sb) {
         selected.push(id);
         emails[id].checked = true;
     }
+    var setEmailUnchecked = function(id) {
+        var index = selected.indexOf(id);
+        if(index > -1) {
+           selected.splice(index, 1); 
+        }else{
+            throw Error("Unchecking email that was never added to selected");
+        }
+        emails[id].checked = false;
+    }
     var setEmailRead = function(id) {
         emails[id].unread = false;
     }
@@ -229,6 +245,7 @@ CORE.create_module("db-emails", function(sb) {
                 "delete-selected-emails-forever",
                 "generate-email",
                 "select-email-checkbox",
+                "deselect-email-checkbox",
                 "selected-emails-unread-state",
                 "open-email"
             ]);
@@ -246,6 +263,9 @@ CORE.create_module("db-emails", function(sb) {
         },
         selectEmailCheckbox : function(id) {
            setEmailChecked(id);
+        },
+        deselectEmailCheckbox : function(id) {
+            setEmailUnchecked(id);
         },
         selectedEmailsUnreadState : function(unread) {
             setEmailsUnreadState(unread);
