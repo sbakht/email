@@ -5,6 +5,9 @@ var Sandbox =  {
             find : function (selector) {
                 return CONTAINER.query(selector);
             },
+            html : function(selector, val) {
+                core.dom.html(CONTAINER, selector, val);
+            },
             hide : function(selector) {
                 if(selector) {
                     core.dom.hide(selector);

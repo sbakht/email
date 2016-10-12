@@ -157,6 +157,9 @@ var CORE = (function () {
             },
             hide : function(CONTAINER) {
                 jQuery(CONTAINER).addClass("hide");
+            },
+            html : function(CONTAINER, selector, val) {
+                jQuery(CONTAINER).find(selector).html(val);
             }
         },
         ajax : {

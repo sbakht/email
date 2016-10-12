@@ -17,8 +17,21 @@ CORE.create_module("email-nav", function (sb) {
                     data : "trash"
                 });
             });
+
+            sb.listen([
+                "db-emails"
+            ]);
         },
         destroy : function () {
+        },
+        dbEmails : function(emails) {
+           var unread = Object.filter(emails, email => email.unread && !email.trash)
+           var countUnreadInbox = Object.keys(unread).length;
+           sb.html(".email-nav_inbox .email-nav_counter", countUnreadInbox);
+
+           var unread = Object.filter(emails, email => email.unread && email.trash)
+           var countUnreadTrash = Object.keys(unread).length;
+           sb.html(".email-nav_trash .email-nav_counter", countUnreadTrash);
         }
     }
 });
@@ -222,6 +235,7 @@ CORE.create_module("db-emails", function(sb) {
     }
     var setEmailRead = function(id) {
         emails[id].unread = false;
+        notifyData();
     }
     var setEmailsUnreadState = function(unread) {
         selected.forEach(function(id) {
