@@ -2,24 +2,16 @@ CORE.create_module("email-nav", function (sb) {
     return {
         init : function() {
             sb.onEvent(".email-nav_inbox", "click", function() {
-                sb.find(".nav--selected").removeClass("nav--selected");
-                sb.find(".email-nav_inbox").addClass("nav--selected");
-                sb.notify({
-                    type : "open-category",
-                    data : "inbox"
-                });
+                History.pushState({type: "state-open-inbox"}, null, "?inbox");
             });
             sb.onEvent(".email-nav_trash", "click", function() {
-                sb.find(".nav--selected").removeClass("nav--selected");
-                sb.find(".email-nav_trash").addClass("nav--selected");
-                sb.notify({
-                    type : "open-category",
-                    data : "trash"
-                });
+                History.pushState({type: "state-open-trash"}, null, "?trash");
             });
 
             sb.listen([
-                "db-emails"
+                "db-emails",
+                "state-open-inbox",
+                "state-open-trash",
             ]);
         },
         destroy : function () {
@@ -32,6 +24,22 @@ CORE.create_module("email-nav", function (sb) {
            var unread = Object.filter(emails, email => email.unread && email.trash)
            var countUnreadTrash = Object.keys(unread).length;
            sb.html(".email-nav_trash .email-nav_counter", countUnreadTrash);
+        },
+        stateOpenInbox : function() {
+            sb.find(".nav--selected").removeClass("nav--selected");
+            sb.find(".email-nav_inbox").addClass("nav--selected");
+            sb.notify({
+                type : "open-category",
+                data : "inbox"
+            });
+        },
+        stateOpenTrash : function() {
+            sb.find(".nav--selected").removeClass("nav--selected");
+            sb.find(".email-nav_trash").addClass("nav--selected");
+            sb.notify({
+                type : "open-category",
+                data : "trash"
+            });
         }
     }
 });
@@ -100,11 +108,11 @@ CORE.create_module("email-catalog", function (sb) {
           .filter( key => predicate(obj[key]) )
           .reduce( (res, key) => (res[key] = obj[key], res), {} );
 
-    var openEmail = function(e) {
+    var openEmail = function(id) {
         sb.hide();
         sb.notify({
             type : "open-email",
-            data : e.currentTarget.getAttribute("data-email-id")
+            data : id
         });
     }
     var selectEmailCheckbox = function(e) {
@@ -134,12 +142,16 @@ CORE.create_module("email-catalog", function (sb) {
     return {
         init : function() {
             activeCategory = "inbox";   
-            sb.onEvent(".email-catalog_email", "click", openEmail);
+            sb.onEvent(".email-catalog_email", "click", function(e) {
+                var id = e.currentTarget.getAttribute("data-email-id");
+                History.pushState({type: "state-open-email", id: id}, null, "?id=" + id);
+            });
             sb.onEvent(".email-catalog_email_checkbox", "click", selectEmailCheckbox);
 
             sb.listen([
                 "db-emails",
-                "open-category"
+                "open-category",
+                "state-open-email",
             ]);
         },
         destroy : function () {
@@ -153,8 +165,10 @@ CORE.create_module("email-catalog", function (sb) {
         openCategory : function(category) {
             activeCategory = category;
             sb.render(getCategoryData(activeCategory));
+        },
+        stateOpenEmail : function(data) {
+            openEmail(data.id);
         }
-
     }
 });
 
@@ -286,6 +300,29 @@ CORE.create_module("db-emails", function(sb) {
         },
         openEmail : function(id) {
            setEmailRead(id); 
+        }
+    }
+});
+
+CORE.create_module("state", function (sb) {
+    var updateState = function() {
+        var State = History.getState(); // Note: We are using History.getState() instead of event.state
+        History.log('statechange:', State.data, State.title, State.url);
+        sb.notify({
+            type : State.data.type,
+            data : State.data
+        });
+    }
+
+    History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+        updateState();
+    });
+
+    return {
+        init : function() {
+            updateState();
+        },
+        destroy : function() {
         }
     }
 });
