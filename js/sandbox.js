@@ -5,11 +5,19 @@ var Sandbox =  {
             find : function (selector) {
                 return CONTAINER.query(selector);
             },
-            hide : function() {
-                core.dom.hide(CONTAINER);
+            hide : function(selector) {
+                if(selector) {
+                    core.dom.hide(selector);
+                }else{
+                    core.dom.hide(CONTAINER);
+                }
             },
-            show : function() {
-                core.dom.show(CONTAINER);
+            show : function(selector) {
+                if(selector){
+                    core.dom.show(selector);
+                }else{
+                    core.dom.show(CONTAINER);
+                }
             },
             render : function(data) {
                 core.createTemplate(module_selector, data);
