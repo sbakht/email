@@ -2,16 +2,16 @@ CORE.create_module("email-nav", function (sb) {
     return {
         init : function() {
             sb.onEvent(".email-nav_inbox", "click", function() {
-                $("#email-nav").find(".nav--selected").removeClass("nav--selected");
-                $(this).addClass("nav--selected");
+                sb.find(".nav--selected").removeClass("nav--selected");
+                sb.find(".email-nav_inbox").addClass("nav--selected");
                 sb.notify({
                     type : "open-category",
                     data : "inbox"
                 });
             });
             sb.onEvent(".email-nav_trash", "click", function() {
-                $("#email-nav").find(".nav--selected").removeClass("nav--selected");
-                $(this).addClass("nav--selected");
+                sb.find(".nav--selected").removeClass("nav--selected");
+                sb.find(".email-nav_trash").addClass("nav--selected");
                 sb.notify({
                     type : "open-category",
                     data : "trash"
