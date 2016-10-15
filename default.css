@@ -27,6 +27,11 @@ body {
     font-size: 14px;
 }
 
+.email-nav_counter {
+    color: white;
+    background: black;
+}
+
 #main-area {
     width: 94%;
 }

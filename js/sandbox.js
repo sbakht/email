@@ -3,7 +3,10 @@ var Sandbox =  {
         var CONTAINER = core.dom.query('#' + module_selector);
         return {
             find : function (selector) {
-                return CONTAINER.query(selector);
+                return CONTAINER.find(selector);
+            },
+            html : function(selector, val) {
+                core.dom.html(CONTAINER, selector, val);
             },
             hide : function(selector) {
                 if(selector) {

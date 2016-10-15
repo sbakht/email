@@ -1,24 +1,51 @@
 CORE.create_module("email-nav", function (sb) {
+    var categories;
     return {
         init : function() {
-            sb.onEvent(".email-nav_inbox", "click", function() {
-                $("#email-nav").find(".nav--selected").removeClass("nav--selected");
-                $(this).addClass("nav--selected");
-                sb.notify({
-                    type : "open-category",
-                    data : "inbox"
+            categories = ["inbox"];
+            categories.forEach(function(category) {
+                sb.onEvent(".email-nav_" + category, "click", function() {
+                    History.pushState({type: "state-open-" + category}, null, "?" + category);
                 });
             });
             sb.onEvent(".email-nav_trash", "click", function() {
-                $("#email-nav").find(".nav--selected").removeClass("nav--selected");
-                $(this).addClass("nav--selected");
-                sb.notify({
-                    type : "open-category",
-                    data : "trash"
-                });
+                History.pushState({type: "state-open-trash"}, null, "?trash");
             });
+
+            sb.listen([
+                "db-emails",
+                "state-open-inbox",
+                "state-open-trash",
+            ]);
         },
         destroy : function () {
+        },
+        dbEmails : function(emails) {
+            categories.forEach(function(category) {
+                var unread = Object.filter(emails, email => email.unread && email.category === category && !email.trash)
+                var countUnread = Object.keys(unread).length;
+                sb.html(".email-nav_" + category + " .email-nav_counter", countUnread);
+            });
+
+           var unread = Object.filter(emails, email => email.unread && email.trash)
+           var countUnreadTrash = Object.keys(unread).length;
+           sb.html(".email-nav_trash .email-nav_counter", countUnreadTrash);
+        },
+        stateOpenInbox : function() {
+            sb.find(".nav--selected").removeClass("nav--selected");
+            sb.find(".email-nav_inbox").addClass("nav--selected");
+            sb.notify({
+                type : "open-category",
+                data : "inbox"
+            });
+        },
+        stateOpenTrash : function() {
+            sb.find(".nav--selected").removeClass("nav--selected");
+            sb.find(".email-nav_trash").addClass("nav--selected");
+            sb.notify({
+                type : "open-category",
+                data : "trash"
+            });
         }
     }
 });
@@ -87,39 +114,48 @@ CORE.create_module("email-catalog", function (sb) {
           .filter( key => predicate(obj[key]) )
           .reduce( (res, key) => (res[key] = obj[key], res), {} );
 
-    var openEmail = function(e) {
+    var openEmail = function(id) {
         sb.hide();
         sb.notify({
             type : "open-email",
-            data : e.currentTarget.getAttribute("data-email-id")
+            data : id
         });
     }
     var selectEmailCheckbox = function(e) {
         e.stopPropagation();
-        sb.notify({
-            type : "select-email-checkbox",
-            data : e.currentTarget.getAttribute("data-email-id")
-        });
+        if(e.currentTarget.checked) {
+            sb.notify({
+                type : "select-email-checkbox",
+                data : e.currentTarget.getAttribute("data-email-id")
+            });
+        }else{
+            sb.notify({
+                type : "deselect-email-checkbox",
+                data : e.currentTarget.getAttribute("data-email-id")
+            });
+        }
     }
     var getCategoryData = function() {
-        if(activeCategory === "inbox") {
-            return Object.filter(emails, email => !email.trash);
-        }else if(activeCategory === "trash"){
+        if(activeCategory === "trash") {
             return Object.filter(emails, email => email.trash);
         }else{
-            throw new Error("No category given");
+            return Object.filter(emails, email => email.category === activeCategory && !email.trash);
         }
     }
 
     return {
         init : function() {
             activeCategory = "inbox";   
-            sb.onEvent(".email-catalog_email", "click", openEmail);
+            sb.onEvent(".email-catalog_email", "click", function(e) {
+                var id = e.currentTarget.getAttribute("data-email-id");
+                History.pushState({type: "state-open-email", id: id}, null, "?id=" + id);
+            });
             sb.onEvent(".email-catalog_email_checkbox", "click", selectEmailCheckbox);
 
             sb.listen([
                 "db-emails",
-                "open-category"
+                "open-category",
+                "state-open-email",
             ]);
         },
         destroy : function () {
@@ -133,8 +169,10 @@ CORE.create_module("email-catalog", function (sb) {
         openCategory : function(category) {
             activeCategory = category;
             sb.render(getCategoryData(activeCategory));
+        },
+        stateOpenEmail : function(data) {
+            openEmail(data.id);
         }
-
     }
 });
 
@@ -204,8 +242,18 @@ CORE.create_module("db-emails", function(sb) {
         selected.push(id);
         emails[id].checked = true;
     }
+    var setEmailUnchecked = function(id) {
+        var index = selected.indexOf(id);
+        if(index > -1) {
+           selected.splice(index, 1); 
+        }else{
+            throw Error("Unchecking email that was never added to selected");
+        }
+        emails[id].checked = false;
+    }
     var setEmailRead = function(id) {
         emails[id].unread = false;
+        notifyData();
     }
     var setEmailsUnreadState = function(unread) {
         selected.forEach(function(id) {
@@ -217,9 +265,9 @@ CORE.create_module("db-emails", function(sb) {
     return {
         init : function() {
             emails = {
-                "someid" : {unread : true, name : "Bob", email : "bob@example.com", body : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eget massa metus. Sed cursus mauris lectus, at consequat leo eleifend eleifend. Duis justo quam, auctor euismod nibh quis, pretium tempor augue. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse sodales id mi ac semper. Ut risus felis, molestie et libero vel, luctus gravida nibh. Proin posuere malesuada nisl vitae pharetra. Donec at condimentum urna. Etiam nec massa massa. Pellentesque libero nunc, ultricies ac scelerisque ac, eleifend non quam."},
-                "someotherid" : {name : "Bob", email : "bob@example.com", body : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eget massa metus. Sed cursus mauris lectus, at consequat leo eleifend eleifend. Duis justo quam, auctor euismod nibh quis, pretium tempor augue. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse sodales id mi ac semper. Ut risus felis, molestie et libero vel, luctus gravida nibh. Proin posuere malesuada nisl vitae pharetra. Donec at condimentum urna. Etiam nec massa massa. Pellentesque libero nunc, ultricies ac scelerisque ac, eleifend non quam."},
-                "yayanotherid" : {name : "Bob", email : "bob@example.com", body : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eget massa metus. Sed cursus mauris lectus, at consequat leo eleifend eleifend. Duis justo quam, auctor euismod nibh quis, pretium tempor augue. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse sodales id mi ac semper. Ut risus felis, molestie et libero vel, luctus gravida nibh. Proin posuere malesuada nisl vitae pharetra. Donec at condimentum urna. Etiam nec massa massa. Pellentesque libero nunc, ultricies ac scelerisque ac, eleifend non quam."},
+                "someid" : {category: "inbox", unread : true, name : "Bob", email : "bob@example.com", body : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eget massa metus. Sed cursus mauris lectus, at consequat leo eleifend eleifend. Duis justo quam, auctor euismod nibh quis, pretium tempor augue. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse sodales id mi ac semper. Ut risus felis, molestie et libero vel, luctus gravida nibh. Proin posuere malesuada nisl vitae pharetra. Donec at condimentum urna. Etiam nec massa massa. Pellentesque libero nunc, ultricies ac scelerisque ac, eleifend non quam."},
+                "someotherid" : {category: "inbox", name : "Bob", email : "bob@example.com", body : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eget massa metus. Sed cursus mauris lectus, at consequat leo eleifend eleifend. Duis justo quam, auctor euismod nibh quis, pretium tempor augue. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse sodales id mi ac semper. Ut risus felis, molestie et libero vel, luctus gravida nibh. Proin posuere malesuada nisl vitae pharetra. Donec at condimentum urna. Etiam nec massa massa. Pellentesque libero nunc, ultricies ac scelerisque ac, eleifend non quam."},
+                "yayanotherid" : {category: "inbox", name : "Bob", email : "bob@example.com", body : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eget massa metus. Sed cursus mauris lectus, at consequat leo eleifend eleifend. Duis justo quam, auctor euismod nibh quis, pretium tempor augue. Interdum et malesuada fames ac ante ipsum primis in faucibus. Suspendisse sodales id mi ac semper. Ut risus felis, molestie et libero vel, luctus gravida nibh. Proin posuere malesuada nisl vitae pharetra. Donec at condimentum urna. Etiam nec massa massa. Pellentesque libero nunc, ultricies ac scelerisque ac, eleifend non quam."},
             };
             selected = [];
 
@@ -229,6 +277,7 @@ CORE.create_module("db-emails", function(sb) {
                 "delete-selected-emails-forever",
                 "generate-email",
                 "select-email-checkbox",
+                "deselect-email-checkbox",
                 "selected-emails-unread-state",
                 "open-email"
             ]);
@@ -247,11 +296,37 @@ CORE.create_module("db-emails", function(sb) {
         selectEmailCheckbox : function(id) {
            setEmailChecked(id);
         },
+        deselectEmailCheckbox : function(id) {
+            setEmailUnchecked(id);
+        },
         selectedEmailsUnreadState : function(unread) {
             setEmailsUnreadState(unread);
         },
         openEmail : function(id) {
            setEmailRead(id); 
+        }
+    }
+});
+
+CORE.create_module("state", function (sb) {
+    var updateState = function() {
+        var State = History.getState(); // Note: We are using History.getState() instead of event.state
+        History.log('statechange:', State.data, State.title, State.url);
+        sb.notify({
+            type : State.data.type,
+            data : State.data
+        });
+    }
+
+    History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+        updateState();
+    });
+
+    return {
+        init : function() {
+            updateState();
+        },
+        destroy : function() {
         }
     }
 });

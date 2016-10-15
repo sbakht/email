@@ -102,21 +102,8 @@ var CORE = (function () {
             }     
         },
         dom : {
-            query : function (selector, context) {
-                var ret = {}, that = this, jqEls, i = 0;
-
-                if (context && context.find) {
-                    jqEls = context.find(selector);
-                } else {
-                    jqEls = jQuery(selector);
-                }
-                
-                ret = jqEls.get();
-                ret.length = jqEls.length;
-                ret.query = function (sel) {
-                    return that.query(sel, jqEls);
-                }
-                return ret;
+            query : function (selector) {
+                return jQuery(selector);
             },
             bind : function (element, evt, fn) {
                 if (element && evt) {
@@ -157,6 +144,9 @@ var CORE = (function () {
             },
             hide : function(CONTAINER) {
                 jQuery(CONTAINER).addClass("hide");
+            },
+            html : function(CONTAINER, selector, val) {
+                jQuery(CONTAINER).find(selector).html(val);
             }
         },
         ajax : {

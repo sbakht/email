@@ -10,8 +10,14 @@
 
         <div id="container">
             <div id="email-nav">
-                <span class="email-nav_inbox nav--selected">Inbox</span>
-                <span class="email-nav_trash">Trash</span>
+                <div class="email-nav_inbox nav--selected">
+                    <span>Inbox</span>
+                    <span class="email-nav_counter"></span>
+                </div>
+                <div class="email-nav_trash">
+                    <span>Trash</span>
+                    <span class="email-nav_counter"></span>
+                </div>
             </div>
             <div id="main-area">
                 <div id="catalog-control">
@@ -51,7 +57,8 @@
 
 
         <script src="js/handlebars.js"></script>
-        <script src="js/jquery.js"></script>
+        <script src="js/lib/jquery.js"></script>
+        <script src="js/lib/jquery.history.js"></script>
         <script src="js/core-jquery.js"></script>
         <script src="js/sandbox.js"></script>
         <script src="js/generate-email.js"></script>
