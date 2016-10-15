@@ -1,8 +1,12 @@
 CORE.create_module("email-nav", function (sb) {
+    var categories;
     return {
         init : function() {
-            sb.onEvent(".email-nav_inbox", "click", function() {
-                History.pushState({type: "state-open-inbox"}, null, "?inbox");
+            categories = ["inbox"];
+            categories.forEach(function(category) {
+                sb.onEvent(".email-nav_" + category, "click", function() {
+                    History.pushState({type: "state-open-" + category}, null, "?" + category);
+                });
             });
             sb.onEvent(".email-nav_trash", "click", function() {
                 History.pushState({type: "state-open-trash"}, null, "?trash");
@@ -17,9 +21,11 @@ CORE.create_module("email-nav", function (sb) {
         destroy : function () {
         },
         dbEmails : function(emails) {
-           var unread = Object.filter(emails, email => email.unread && !email.trash)
-           var countUnreadInbox = Object.keys(unread).length;
-           sb.html(".email-nav_inbox .email-nav_counter", countUnreadInbox);
+            categories.forEach(function(category) {
+                var unread = Object.filter(emails, email => email.unread && email.category === category && !email.trash)
+                var countUnread = Object.keys(unread).length;
+                sb.html(".email-nav_" + category + " .email-nav_counter", countUnread);
+            });
 
            var unread = Object.filter(emails, email => email.unread && email.trash)
            var countUnreadTrash = Object.keys(unread).length;
